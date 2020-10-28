@@ -1,0 +1,6 @@
+projectKey=ashleshs
+serverUrl=http://54.174.151.218:9000
+serverVersion=7.5.0.20543
+dashboardUrl=http://54.174.151.218:9000/dashboard?id=ashleshs
+ceTaskId=AXVpFtdPoPZD1o1Z5TGr
+ceTaskUrl=http://54.174.151.218:9000/api/ce/task?id=AXVpFtdPoPZD1o1Z5TGr
