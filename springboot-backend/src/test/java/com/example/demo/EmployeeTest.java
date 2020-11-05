@@ -22,22 +22,22 @@ public class EmployeeTest {
 	@Autowired
 	private EmployeeRepository employeeRepository;
 	
-	@Test
-	@Rollback(false)
-	public void testCreate()
-	{
-		Employee employee=new Employee("chetan","tingse","chetan@gmail.com");
-		Employee saveEmp=employeeRepository.save(employee);
-		assertNotNull(saveEmp);
-	}
+// 	@Test
+// 	@Rollback(false)
+// 	public void testCreate()
+// 	{
+// 		Employee employee=new Employee("chetan","tingse","chetan@gmail.com");
+// 		Employee saveEmp=employeeRepository.save(employee);
+// 		assertNotNull(saveEmp);
+// 	}
 	
-	@Test
-	public void testListEmployees() {
-		List<Employee> employee=employeeRepository.findAll();
+// 	@Test
+// 	public void testListEmployees() {
+// 		List<Employee> employee=employeeRepository.findAll();
 		
-		for(Employee employees:employee) {
-			System.out.println(employees);
-		}
-		assertThat(employee).size().isGreaterThan(0);
-	}
+// 		for(Employee employees:employee) {
+// 			System.out.println(employees);
+// 		}
+// 		assertThat(employee).size().isGreaterThan(0);
+// 	}
 }
