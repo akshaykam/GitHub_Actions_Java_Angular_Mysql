@@ -10,6 +10,7 @@ import { CreateEmployeeComponent } from './create-employee/create-employee.compo
 import {FormsModule} from '@angular/forms';
 import { UpdateEmployeeComponent } from './update-employee/update-employee.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -25,6 +26,7 @@ import { UpdateEmployeeComponent } from './update-employee/update-employee.compo
     AppRoutingModule,
     HttpClientModule,
     FormsModule
+    
   ],
   providers: [],
   bootstrap: [AppComponent]

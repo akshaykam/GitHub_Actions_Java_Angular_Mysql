@@ -1,4 +1,7 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {  RouterModule } from '@angular/router';
+import { AppRoutingModule } from '../app-routing.module';
 
 import { EmployeeListComponent } from './employee-list.component';
 
@@ -8,7 +11,8 @@ describe('EmployeeListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EmployeeListComponent ]
+      declarations: [ EmployeeListComponent ],
+      imports:[ HttpClientModule,RouterModule,AppRoutingModule]
     })
     .compileComponents();
   });
@@ -20,6 +24,9 @@ describe('EmployeeListComponent', () => {
   });
 
   it('should create', () => {
+    // fixture = TestBed.createComponent(EmployeeListComponent);
+    // component = fixture.componentInstance;
+    // fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 });
