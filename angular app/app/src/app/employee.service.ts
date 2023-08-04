@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class EmployeeService {
-  private baseURL="http://${HOST}:8080/api/v1/employees";
+  private baseURL="springboot-docker-container:8080";
   constructor(private httpClient:HttpClient) { }
   getEmployeesList():Observable<Employee[]>{
     return this.httpClient.get<Employee[]>(`${this.baseURL}`);
