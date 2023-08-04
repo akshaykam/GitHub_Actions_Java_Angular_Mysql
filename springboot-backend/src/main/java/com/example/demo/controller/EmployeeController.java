@@ -22,6 +22,7 @@ import com.example.demo.repository.EmployeeRepository;
 
 @RestController
 @CrossOrigin(origins = "*")
+//@CrossOrigin(origins = {"http://172.27.59.220:4200","http://angular-docker-container:80"})	
 //@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1/")
 public class EmployeeController {
