@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-java:
-    runs-on: vmbox2
+    runs-on: 'self-hosted'
 
     steps:
     - name: repository checkout
