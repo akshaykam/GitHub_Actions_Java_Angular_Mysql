@@ -1,0 +1,32 @@
+
+# placeholder
+name: PR Decoration, Dockerize Java App and Deploy on EC2 with ASG
+
+# events on which pipeline will run
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-java:
+    runs-on: vmbox2
+
+    steps:
+    - name: repository checkout
+    - uses: actions/checkout@v4
+
+    - name: java setup
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu' # See 'Supported distributions' for available options
+        java-version: '8'
+
+    - name: Set up Maven
+    - uses: stCarolas/setup-maven@v4.5
+      with:
+        maven-version: '3.8.2'
+
+    - name: build with maven
+    - run: mvn clean install -DskipTests=true
