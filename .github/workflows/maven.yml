@@ -30,4 +30,3 @@ jobs:
 
     - name: build with maven
       run: cd ./springboot-backend ; mvn clean install -DskipTests=true
-      run: cd springboot-backend/ ; mvn clean install -DskipTests=true
