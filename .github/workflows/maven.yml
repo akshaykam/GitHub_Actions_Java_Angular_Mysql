@@ -3,11 +3,11 @@
 name: PR Decoration, Dockerize Java App and Deploy on EC2 with ASG
 
 # events on which pipeline will run
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: []
+#  push:
+#    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
 
 jobs:
   build-java:
@@ -29,6 +29,4 @@ jobs:
         maven-version: '3.8.2'
 
     - name: build with maven
-      run: |
-      cd ./springboot-backend
-      mvn clean install -DskipTests=true
+      run: cd springboot-backend/ ; mvn clean install -DskipTests=true
