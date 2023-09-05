@@ -1,14 +1,13 @@
-name: SonarCloud
+name: SonarCloud Analysis
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_run:
+    workflows: ["PR Decoration, Dockerize Java App and Deploy on EC2 with ASG"]
+    types:
+      - completed
 jobs:
   build:
-    name: Build and analyze
-    runs-on: ubuntu-latest
+    name: static code analysis
+    runs-on: 'self-hosted'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -32,6 +31,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
         env:
+          echo "Using GITHUB_TOKEN: $GITHUB_TOKEN";
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=akshaykam_GitHub_Actions_Java_Angular_Mysql
