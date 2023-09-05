@@ -30,3 +30,22 @@ jobs:
 
     - name: build with maven
       run: cd ./springboot-backend ; mvn clean install -DskipTests=true
+  
+  build-angular:
+    runs-on: 'self-hosted'
+    steps:
+      - name: set up Node.js
+        uses: actions/setup-node@v3
+        with:
+            node-version: 16 #you can adjust node version 14,16,18
+        
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli 
+
+      - name: Build Angular app
+        run: |
+          cd angular app/app 
+          npm install 
+          ng build --prod
+
+
