@@ -26,11 +26,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
         run: |
-          - name: SonarQube Scan
-          uses: sonarsource/sonarqube-scan-action@master
-          env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          uses: kitabisa/sonarqube-action@master
+          with:
+          host: ${{ secrets.SONAR_HOST_URL }}
+          login: ${{ secrets.SONAR_TOKEN }}
          
           #cd springboot-backend
           #mvn -B verify sonar:sonar ; -Dsonar.projectName=GitHub_Actions_Java_Angular_Mysql ;-Dsonar.projectKey=akshaykam_GitHub_Actions_Java_Angular_Mysql ; -Dsonar.projectVersion=1.0 -Dsonar.sources=. ; -Dsonar.host.url={{ secrets.SONAR_HOST_URL }} ; -Dsonar.login=${{ secrets.SONAR_TOKEN }} 
