@@ -61,4 +61,11 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
+       
+  Slack-notification:
+      steps:
+        - name: Send GitHub Action trigger data to Slack workflow
+          id: slack
+          uses: slackapi/slack-github-action@v1.24.0
+          env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
