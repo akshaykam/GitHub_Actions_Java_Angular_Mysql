@@ -4,11 +4,15 @@ name: PR Decoration, Dockerize Java App and Deploy on EC2 with ASG
 
 # events on which pipeline will run
 on: 
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
+  #push:
+    #branches: [ master ]
+  #pull_request:
+    #branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      parameter_name:
+        description: 'manually running jobs'
+        required: true
 jobs:
   build-java:
     runs-on: 'self-hosted'
@@ -50,6 +54,7 @@ jobs:
     
   SonarQube-analysis:
       runs-on: 'self-hosted'
+      needs: 'build-java'
       steps:
         - name: SonarQube Scan
           uses: sonarsource/sonarqube-scan-action@master
