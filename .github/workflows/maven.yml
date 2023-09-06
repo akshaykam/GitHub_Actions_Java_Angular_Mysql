@@ -47,5 +47,16 @@ jobs:
           cd ./"angular app"/app 
           npm install 
           ng build --prod
-
+    
+  SonarQube-analysis:
+      runs-on: 'self-hosted'
+      steps:
+      - name: SonarQube analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
+        run: |
+          uses: kitabisa/sonarqube-action@master
+          with:
+          host: ${{ secrets.SONAR_HOST_URL }}
+          login: ${{ secrets.SONAR_TOKEN }}
 
