@@ -26,7 +26,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
         run: |
-          mvn --file $pwd/springboot-backend/pom.xml -B verify sonar:sonar ; -Dsonar.projectName=GitHub_Actions_Java_Angular_Mysql ;-Dsonar.projectKey=akshaykam_GitHub_Actions_Java_Angular_Mysql ; -Dsonar.projectVersion=1.0 -Dsonar.sources=. ; -Dsonar.host.url={{ secrets.SONAR_HOST_URL }} ; -Dsonar.login=${{ secrets.SONAR_TOKEN }} 
+          cd springboot-backend
+          mvn -B verify sonar:sonar ; -Dsonar.projectName=GitHub_Actions_Java_Angular_Mysql ;-Dsonar.projectKey=akshaykam_GitHub_Actions_Java_Angular_Mysql ; -Dsonar.projectVersion=1.0 -Dsonar.sources=. ; -Dsonar.host.url={{ secrets.SONAR_HOST_URL }} ; -Dsonar.login=${{ secrets.SONAR_TOKEN }} 
 
           # Download and configure Sonar Scanner
           #wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
