@@ -22,9 +22,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
         run: |
           # Download and configure Sonar Scanner
-          curl -L -o sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-x.y.z.zip
-          unzip sonar-scanner-cli.zip
-          export PATH=$PATH:$(pwd)/sonar-scanner-cli-x.y.z/bin
+          curl -L -o sonar-scanner-cli-4.2.0.1873-linux.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+          unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+          export PATH=$PATH:$(pwd)/sonar-scanner-cli-4.2.0.1873-linux/bin
 
           # Run Sonar Scanner
           sonar-scanner \
