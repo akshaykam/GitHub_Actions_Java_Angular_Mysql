@@ -25,7 +25,10 @@ jobs:
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
           pwd
           unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+          chmod -R +rw sonar-scanner-cli-4.2.0.1873-linux
           export PATH=$PATH:$(pwd)/sonar-scanner-cli-4.2.0.1873-linux/bin
+          #export PATH=$PATH:/home/akshay/actions-runner/-work/GitHub_Actions_Java_Angular_Mysql/GitHub_Actions_Java_Angular_Mysql/sonar-scanner-4.2.0.1873-linux/bin
+          echo $PATH
           sonar-scanner --version
 
           # Run Sonar Scanner
