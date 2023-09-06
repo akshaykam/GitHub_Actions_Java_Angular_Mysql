@@ -63,8 +63,7 @@ jobs:
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
        
   Slack-notification:
-       #runs-on: 'self-hosted'
-      - name: Send custom JSON data to Slack workflow
+        runs-on: 'self-hosted'
         needs: ['build-java','build-angular','SonarQube-analysis']
         steps:
         id: slack
