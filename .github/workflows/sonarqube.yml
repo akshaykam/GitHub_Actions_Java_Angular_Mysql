@@ -23,6 +23,7 @@ jobs:
         run: |
           # Download and configure Sonar Scanner
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+          pwd
           unzip sonar-scanner-cli-4.2.0.1873-linux.zip
           export PATH=$PATH:$(pwd)/sonar-scanner-cli-4.2.0.1873-linux/bin
           sonar-scanner --version
