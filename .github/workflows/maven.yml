@@ -42,6 +42,15 @@ jobs:
        path: ~/.m2
        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
        restore-keys:  ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+    - name: Debug Cache
+      run: |
+       echo "Cache Key: ${{ runner.os }}-${{ env.cache_key }}"
+       echo "Cache Directory Contents:"
+       ls -al ~/.m2
+      env:
+       cache_key: Linux-
+  
   
   build-angular:
     runs-on: 'self-hosted'
