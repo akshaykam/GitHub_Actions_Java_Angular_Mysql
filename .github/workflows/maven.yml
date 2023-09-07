@@ -66,8 +66,12 @@ jobs:
       runs-on: 'self-hosted'
       needs: ['build-java','build-angular','SonarQube-analysis']
       steps:
-        - name: Send GitHub Action trigger data to Slack workflow
-          id: slack
-          uses: slackapi/slack-github-action@v1.24.0
+        - name: Slack Notification
+          uses: act10ns/slack@v1
+          with:
+            status: ${{job.status}}
+            steps:  ${{toJson(steps)}}
+            channel: '#github_actions_notification'
+            if: always()
           env:
            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
