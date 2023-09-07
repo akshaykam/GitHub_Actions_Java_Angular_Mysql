@@ -41,7 +41,7 @@ jobs:
       with:
        path: ~/.m2
        key: springboot-cache-on-self_hosted
-       re-store:  springboot-cache-on-self_hosted
+       restore-keys:  springboot-cache-on-self_hosted
   
   build-angular:
     runs-on: 'self-hosted'
@@ -66,7 +66,7 @@ jobs:
         with:
          path: ~/.npm
          key: angular-cache-on-self_hosted
-         re-store:  angular-cache-on-self_hosted   
+         restore-keys:  angular-cache-on-self_hosted   
         
     
   SonarQube-analysis:
