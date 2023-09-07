@@ -36,7 +36,7 @@ jobs:
       run: cd ./springboot-backend ; mvn clean install -DskipTests=true
     
     - name: cache for springapp
-      uses: actions/cache/restore@v3
+      uses: actions/cache@v3
       id: cache
       with:
        path: ~/.m2
@@ -61,12 +61,12 @@ jobs:
           ng build --prod
 
       - name: cache for Angularapp
-        uses: actions/cache/restore@v3
-        id: cache
+        uses: actions/cache@v3
+        id: angular-cache
         with:
          path: ~/.npm
-         key: angular-cache-on-self_hosted
-         restore-keys:  angular-cache-on-self_hosted   
+         key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+         restore-keys: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
         
     
   SonarQube-analysis:
