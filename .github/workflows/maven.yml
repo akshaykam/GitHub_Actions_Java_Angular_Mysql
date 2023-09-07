@@ -87,7 +87,7 @@ jobs:
     
   SonarQube-analysis:
       runs-on: 'self-hosted'
-      needs: 'build-java'
+      needs: [ 'build-java','build-angular' ]
       steps:
         - name: SonarQube Scan
           uses: sonarsource/sonarqube-scan-action@master
