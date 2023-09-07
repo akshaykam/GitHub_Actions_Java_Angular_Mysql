@@ -34,6 +34,14 @@ jobs:
 
     - name: build with maven
       run: cd ./springboot-backend ; mvn clean install -DskipTests=true
+    
+    - name: cache for springapp
+      uses: actions/cache/restore@v3
+      id: cache
+      with:
+       path: ~/.m2
+       key: springboot-cache-on-self_hosted
+       re-store:  springboot-cache-on-self_hosted
   
   build-angular:
     runs-on: 'self-hosted'
@@ -51,6 +59,15 @@ jobs:
           cd ./"angular app"/app 
           npm install 
           ng build --prod
+
+      - name: cache for Angularapp
+        uses: actions/cache/restore@v3
+        id: cache
+        with:
+         path: ~/.npm
+         key: angular-cache-on-self_hosted
+         re-store:  angular-cache-on-self_hosted   
+        
     
   SonarQube-analysis:
       runs-on: 'self-hosted'
