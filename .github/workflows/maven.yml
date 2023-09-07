@@ -119,12 +119,12 @@ jobs:
 
 # Building docker image and uploading to Jfrog artifactory
   Docker-build:
-       needs: ['build-java','build-angular','SonarQube-analysis']
-       steps:
-        - name
-          run:|
-           cd ./springboot-backend
-          - docker build -t  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}  .
-          - docker login -u {{ secrets.JFROG_USERNAME }} -p {{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
-          - docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
-
+   runs-on: 'self-hosted'
+   needs: ['build-java','build-angular','SonarQube-analysis']
+   steps:
+      - name: docker stage
+        run: |
+              cd ./springboot-backend
+              docker build -t  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}  .
+              docker login -u {{ secrets.JFROG_USERNAME }} -p {{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+              docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
