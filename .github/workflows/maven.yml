@@ -40,8 +40,8 @@ jobs:
       id: cache
       with:
        path: ~/.m2
-       key: springboot-cache-on-self_hosted
-       restore-keys:  springboot-cache-on-self_hosted
+       key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+       restore-keys:  ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
   
   build-angular:
     runs-on: 'self-hosted'
