@@ -14,6 +14,10 @@ on:
         description: 'manually running jobs'
         required: true
 jobs:
+
+# Building SpringBoot application, caching dependencies and build outputs to improve workflow execution time.
+# maximum allowed caching per repository : 10GB
+
   build-java:
     runs-on: 'self-hosted'
 
@@ -42,7 +46,8 @@ jobs:
        path: ~/.m2
        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
        restore-keys:  ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-
+       lookup-only: true
+       
     - name: Debug Cache
       run: |
        echo "Cache Key: ${{ runner.os }}-${{ env.cache_key }}"
@@ -51,7 +56,7 @@ jobs:
       env:
        cache_key: Linux-
   
-  
+  # Building Angular application, caching dependencies and build outputs to improve workflow execution time.
   build-angular:
     runs-on: 'self-hosted'
     steps:
@@ -76,6 +81,7 @@ jobs:
          path: ~/.npm
          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
          restore-keys: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+         lookup-only: true
          
       - name: Debug Cache
         run: |
@@ -84,7 +90,8 @@ jobs:
          ls -al ~/.m2
         env:
           cache_key: Linux-  
-    
+
+  # SonarQube analysis using SonarQube Actions 
   SonarQube-analysis:
       runs-on: 'self-hosted'
       needs: [ 'build-java','build-angular' ]
@@ -94,7 +101,8 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-       
+
+  #Github Integration with slack channel      
   Slack-notification:
       runs-on: 'self-hosted'
       needs: ['build-java','build-angular','SonarQube-analysis']
@@ -108,3 +116,15 @@ jobs:
             if: always()
           env:
            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+# Building docker image and uploading to Jfrog artifactory
+  Docker-build:
+       needs: ['build-java','build-angular','SonarQube-analysis']
+       steps:
+        - name
+          run:|
+           cd ./springboot-backend
+          - docker build -t  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}  .
+          - docker login -u {{ secrets.JFROG_USERNAME }} -p {{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+          - docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
+
