@@ -66,7 +66,7 @@ jobs:
       run: |
               cd ./springboot-backend
               docker build -t  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}  .
-              docker login -u {{ secrets.JFROG_USERNAME }} -p {{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+              docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
               docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
               
   # Building Angular application, caching dependencies and build outputs to improve workflow execution time.
