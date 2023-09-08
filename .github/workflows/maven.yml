@@ -122,9 +122,15 @@ jobs:
    runs-on: 'self-hosted'
    needs: ['build-java','build-angular','SonarQube-analysis']
    steps:
-      - name: docker stage
+      - name: docker stage + springapp
         run: |
               cd ./springboot-backend
               docker build -t  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}  .
-              docker login -u {{ secrets.JFROG_USERNAME }} -p {{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+              docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
               docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
+      - name: docker stage + angularapp
+        run: |
+             cd ./"angular app"/app 
+             docker build -t  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}  .
+             docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+             docker push  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}
