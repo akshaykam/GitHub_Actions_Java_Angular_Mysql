@@ -1,31 +1,52 @@
-version: '3'
+version: '3.0'
+
 services:
-  mysql-standalone:
-    image: mysql:latest
-    container_name: mysql-standalone
+  spring_database:
+    image: mysql
+    container_name: spring_database
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=employeedb
-  springboot-docker-container:
-    image: springapp
-    container_name: springboot-docker-container
+      MYSQL_ROOT_PASSWORD: ${MY_SQL_ROOT}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:      
+      test: ["CMD", "mysqladmin", "ping", "-h", "spring_database"]  # Or use the hostname of your MySQL container      
+      interval: 10s      
+      timeout: 10s      
+      retries: 3         
     ports:
-      - 8080:8080
-    command: ["sh", "-c", "while ! nc -z mysql-standalone 3306; do sleep 1; done && java -jar app.jar"]
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-standalone:3306/employeedb?useSSL=false&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASS=root
-    build:
-      context: ./springboot-backend/
-      dockerfile: Dockerfile
+      - 3308:3306
+    volumes:
+     - dockerAngularSpringDatabaseData:/var/lib/mysql
+    networks:
+     - 3tierNetwork
+     
+  springapp:
+    image: 172.27.59.80:8082/akshay-github-actions/gha-springapp:${RUN_NUMBER}
+    container_name: springapp
+    ports:
+      - 8085:8080
     depends_on:
-      - mysql-standalone
-  angular-docker-container:
-    image: angularapp
-    container_name: angular-docker-container
-    ports:
+      spring_database:
+                  condition: service_healthy     
+    environment:      
+      SPRING_DATASOURCE_URL: jdbc:mysql://spring_database:3306/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false      
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}      
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+     - 3tierNetwork
+      
+  angularapp:
+    image: 172.27.59.80:8082/akshay-github-actions/gha-angularapp/:${RUN_NUMBER}
+    container_name: angularapp
+    ports: 
       - 4200:80
-    build:
-      context: ./angular app/app/
-      dockerfile: Dockerfile
+    depends_on:
+      - springapp
+    networks:
+      - 3tierNetwork
+      
+volumes:
+  dockerAngularSpringDatabaseData:  
+networks:
+  3tierNetwork:
