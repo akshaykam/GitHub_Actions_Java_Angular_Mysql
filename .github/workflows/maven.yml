@@ -13,6 +13,12 @@ on:
       parameter_name:
         description: 'manually running jobs'
         required: true
+env:
+     MY_SQL_ROOT: ${{ secrets.MY_SQL_ROOT_PASSWORD }}
+     MYSQL_USER: ${{ secrets.MYSQL_USER }}
+     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+     MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+     RUN_NUMBER: ${{ github.run_number }}        
 jobs:
 
 # Building SpringBoot application, caching dependencies and build outputs to improve workflow execution time.
@@ -55,6 +61,13 @@ jobs:
        ls -al ~/.m2
       env:
        cache_key: Linux-
+    
+    - name: docker stage + angularapp
+      run: |
+             cd ./"angular app"/app 
+             docker build -t  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}  .
+             docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+             docker push  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}
   
   # Building Angular application, caching dependencies and build outputs to improve workflow execution time.
   build-angular:
@@ -90,6 +103,14 @@ jobs:
          ls -al ~/.m2
         env:
           cache_key: Linux-  
+      
+      - name: docker stage + angularapp
+        run: |
+             cd ./"angular app"/app 
+             docker build -t  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}  .
+             docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+             docker push  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}
+          
 
   # SonarQube analysis using SonarQube Actions 
   SonarQube-analysis:
@@ -105,7 +126,7 @@ jobs:
   #Github Integration with slack channel      
   Slack-notification:
       runs-on: 'self-hosted'
-      needs: ['build-java','build-angular','SonarQube-analysis','Docker-build']
+      needs: ['build-java','build-angular','SonarQube-analysis']
       steps:
         - name: Slack Notification
           uses: act10ns/slack@v1
@@ -115,27 +136,13 @@ jobs:
             channel: '#github_actions_notification'
             if: always()
           env:
-           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }
 
-# Building docker image and uploading to Jfrog artifactory
-  Docker-build:
-   runs-on: 'self-hosted'
-   needs: ['build-java','build-angular','SonarQube-analysis']
-   steps:
-      - name: docker stage + springapp
-        run: |
-              cd ./springboot-backend
-              docker build -t  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}  .
-              docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
-              docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
-      - name: docker stage + angularapp
-        run: |
-             cd ./"angular app"/app 
-             docker build -t  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}  .
-             docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
-             docker push  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}
-      
-      - name: compose up
-        run: |
+  Run-stage:      
+      runs-on: 'self-hosted'
+      needs: ['build-java','build-angular','SonarQube-analysis']
+      steps:
+       - name: compose up
+         run: |
             docker rm -f springapp spring_database angularapp
             docker-compose up -d  
