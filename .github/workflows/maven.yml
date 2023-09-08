@@ -137,12 +137,3 @@ jobs:
             if: always()
           env:
            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  #Run-stage:      
-  #    runs-on: 'self-hosted'
-  #    needs: ['build-java','build-angular','SonarQube-analysis']
-  #    steps:
-       - name: compose up
-         run: |
-            docker rm -f springapp spring_database angularapp
-            docker-compose up -d  
