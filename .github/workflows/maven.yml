@@ -136,7 +136,7 @@ jobs:
             channel: '#github_actions_notification'
             if: always()
           env:
-           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }
+           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   Run-stage:      
       runs-on: 'self-hosted'
