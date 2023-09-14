@@ -21,6 +21,19 @@ env:
      RUN_NUMBER: ${{ github.run_number }}        
 jobs:
 
+  name: workflow using Snyk
+    # on: push
+  security:
+    runs-on: 'self-hosted'
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+
 # Building SpringBoot application, caching dependencies and build outputs to improve workflow execution time.
 # maximum allowed caching per repository : 10GB
 
