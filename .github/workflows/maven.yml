@@ -21,9 +21,14 @@ env:
      RUN_NUMBER: ${{ github.run_number }}        
 jobs:
 
-  name: workflow using Snyk
+ - name: workflow using Snyk
     # on: push
-  security:
+   on: 
+     workflow_dispatch:
+      inputs:
+      parameter_name:
+        description: 'manually running jobs'
+   security:
     runs-on: 'self-hosted'
     steps:
       - uses: actions/checkout@master
