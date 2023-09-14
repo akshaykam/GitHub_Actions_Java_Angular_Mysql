@@ -23,14 +23,19 @@ env:
 jobs:
  snyk-scan: 
    runs-on: 'self-hosted'
+   container:
+      image: node:14  # Use an image that matches your GLIBC version
+      options: --user root  # This allows you to install packages as the root user
+
    steps:
-      - uses: actions/checkout@master
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Snyk Security Scan
+        run: snyk auth ${{ secrets.SNYK_API_TOKEN }} && snyk test       
 
 # Building SpringBoot application, caching dependencies and build outputs to improve workflow execution time.
 # maximum allowed caching per repository : 10GB
