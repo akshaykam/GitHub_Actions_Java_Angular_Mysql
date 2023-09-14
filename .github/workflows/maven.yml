@@ -32,11 +32,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: check Snyk CLI installation
-        run: snyk --version #snyk is installed on self-hosted runner
+        run: |
+         cd ./"angular app"/app
+         sudo npm install
+         snyk --version           #snyk is installed on self-hosted runner
+         snyk auth ${{ secrets.SNYK_API_TOKEN }} && snyk test --json > snyk-results.json
+         
         #sudo npm install -g snyk
-
-      - name: Snyk Security Scan
-        run: snyk auth ${{ secrets.SNYK_API_TOKEN }} && snyk test       
 
 # Building SpringBoot application, caching dependencies and build outputs to improve workflow execution time.
 # maximum allowed caching per repository : 10GB
