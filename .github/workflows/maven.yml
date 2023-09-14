@@ -25,7 +25,7 @@ jobs:
    runs-on: 'self-hosted'
    container:
       image: node:14  # Use an image that matches your GLIBC version
-      options: --user root  # This allows you to install packages as the root user
+      options: --user akshay  # This allows you to install packages as the root user
 
    steps:
       - name: Checkout Code
