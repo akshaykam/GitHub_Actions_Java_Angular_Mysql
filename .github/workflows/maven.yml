@@ -19,18 +19,11 @@ env:
      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
      RUN_NUMBER: ${{ github.run_number }}        
+     
 jobs:
-
- - name: workflow using Snyk
-    # on: push
-   on: 
-     workflow_dispatch:
-      inputs:
-      parameter_name:
-        description: 'manually running jobs'
-   security:
-    runs-on: 'self-hosted'
-    steps:
+ snyk-scan: 
+   runs-on: 'self-hosted'
+   steps:
       - uses: actions/checkout@master
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
@@ -42,7 +35,7 @@ jobs:
 # Building SpringBoot application, caching dependencies and build outputs to improve workflow execution time.
 # maximum allowed caching per repository : 10GB
 
-  build-java:
+ build-java:
     runs-on: 'self-hosted'
 
     steps:
@@ -100,7 +93,7 @@ jobs:
               docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
               
   # Building Angular application, caching dependencies and build outputs to improve workflow execution time.
-  build-angular:
+ build-angular:
     runs-on: 'self-hosted'
     steps:
       - name: set up Node.js
@@ -143,7 +136,7 @@ jobs:
           
 
   # SonarQube analysis using SonarQube Actions 
-  SonarQube-analysis:
+ SonarQube-analysis:
       runs-on: 'self-hosted'
       needs: [ 'build-java','build-angular' ]
       steps:
@@ -154,7 +147,7 @@ jobs:
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   #Github Integration with slack channel      
-  Slack-notification:
+ Slack-notification:
       runs-on: 'self-hosted'
       needs: ['build-java','build-angular','SonarQube-analysis']
       steps:
@@ -167,7 +160,7 @@ jobs:
             if: always()
           env:
            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  deploy:
+ deploy:
     runs-on: 'self-hosted'
     needs: ['build-java','build-angular','SonarQube-analysis']
     environment: Dev
