@@ -6,16 +6,32 @@ name: PR Decoration, Dockerize Java App and Deploy on EC2 with ASG
 on: 
   push:
     branches: [ master ]
-#  pull_request:
-#    branches: [ master ]
-
+  #pull_request:
+    #branches: [ master ]
+  #workflow_dispatch:
+    #inputs:
+      #parameter_name:
+        #description: 'manually running jobs'
+        #required: true
+env:
+     MY_SQL_ROOT: ${{ secrets.MY_SQL_ROOT_PASSWORD }}
+     MYSQL_USER: ${{ secrets.MYSQL_USER }}
+     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+     MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+     RUN_NUMBER: ${{ github.run_number }}        
+     
 jobs:
-  build-java:
+
+# Building SpringBoot application, caching dependencies and build outputs to improve workflow execution time.
+# maximum allowed caching per repository : 10GB
+
+ build-java:
+
     runs-on: 'self-hosted'
 
     steps:
     - name: repository checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
     - name: java setup
       uses: actions/setup-java@v3
@@ -30,3 +46,146 @@ jobs:
 
     - name: build with maven
       run: cd ./springboot-backend ; mvn clean install -DskipTests=true
+    
+    - name: cache for springapp
+      uses: actions/cache@v3
+      id: cache
+      with:
+       path: ~/.m2
+       key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+       restore-keys:  ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+       lookup-only: true
+       
+    - name: Debug Cache
+      run: |
+       echo "Cache Key: ${{ runner.os }}-${{ env.cache_key }}"
+       echo "Cache Directory Contents:"
+       ls -al ~/.m2
+      env:
+       cache_key: Linux-
+       
+#    - name: Jacoco Report to PR
+#      id: jacoco
+#       uses: madrapps/jacoco-report@v1.6.1
+#       with:
+#       paths: ${{ github.workspace }}/springboot-backend/target/site/jacoco/jacoco.xml
+#       token: ${{ secrets.GITHUB_TOKEN }}
+#       min-coverage-overall: 40
+#       min-coverage-changed-files: 60
+#       title: '# :lobster: Coverage Report'
+#       pass-emoji: ':green_circle:'
+#       fail-emoji: ':red_circle:'
+    
+    - name: docker stage + springapp
+      run: |
+              cd ./springboot-backend
+              docker build -t  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}  .
+              docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+              docker push  172.27.59.80:8082/akshay-github-actions/gha-springapp:${{ github.run_number }}
+              
+  # Building Angular application, caching dependencies and build outputs to improve workflow execution time.
+ build-angular:
+    runs-on: 'self-hosted'
+    steps:
+      - name: set up Node.js
+        uses: actions/setup-node@v3
+        with:
+            node-version: 16 #you can adjust node version 14,16,18
+        
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli 
+
+      - name: Build Angular app
+        run: |
+          cd ./"angular app"/app 
+          npm install 
+          ng build --prod
+
+      - name: cache for Angularapp
+        uses: actions/cache@v3
+        id: angular-cache
+        with:
+         path: ~/.npm
+         key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+         restore-keys: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+         lookup-only: true
+         
+      - name: Debug Cache
+        run: |
+         echo "Cache Key: ${{ runner.os }}-${{ env.cache_key }}"
+         echo "Cache Directory Contents:"
+         ls -al ~/.m2
+        env:
+          cache_key: Linux-  
+      
+      - name: docker stage + angularapp
+        run: |
+             cd ./"angular app"/app 
+             docker build -t  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}  .
+             docker login -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} http://172.27.59.80:8082
+             docker push  172.27.59.80:8082/akshay-github-actions/gha-angularapp:${{ github.run_number }}
+             
+ snyk-scan: 
+   runs-on: 'self-hosted'
+   needs: ['build-java','build-angular']
+   container:
+      image: node:14  # Use an image that matches your GLIBC version
+      options: --user root  # This allows you to install packages as the root user
+
+   steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: check Snyk CLI installation
+        run: |
+         cd ./"angular app"/app
+         sudo npm install
+         snyk --version           #snyk is installed on self-hosted runner
+         snyk auth ${{ secrets.SNYK_API_TOKEN }} && snyk test --json > snyk-results.json
+         
+        #sudo npm install -g snyk        
+
+  # SonarQube analysis using SonarQube Actions 
+ SonarQube-analysis:
+      runs-on: 'self-hosted'
+      needs: [ 'build-java','build-angular' ]
+      steps:
+        - name: SonarQube Scan
+          uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  #Github Integration with slack channel      
+ Slack-notification:
+      runs-on: 'self-hosted'
+      needs: ['build-java','build-angular','SonarQube-analysis']
+      steps:
+        - name: Slack Notification
+          uses: act10ns/slack@v1
+          with:
+            status: ${{job.status}}
+            steps:  ${{toJson(steps)}}
+            channel: '#github_actions_notification'
+            if: always()
+          env:
+           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  
+ deploy:
+    runs-on: 'self-hosted'
+    needs: ['build-java','build-angular','SonarQube-analysis']
+    environment: Dev
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v2
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
+        role-session-name: GitHub-Action-Role
+        aws-region: ${{ env.Dev.AWS_REGION }}
+    - run: |
+        echo "Deploying branch ${{ env.GITHUB_REF }} to ${{ github.event.inputs.environment }}"
+        commit_hash=`git rev-parse HEAD`
+        #aws deploy create-deployment --application-name CodeDeployAppNameWithASG --deployment-group-name CodeDeployGroupName --github-location repository=$GITHUB_REPOSITORY,commitId=$commit_hash --ignore-application-stop-failures

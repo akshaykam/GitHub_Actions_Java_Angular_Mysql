@@ -1,0 +1,55 @@
+name: SonarCloud Analysis
+on:
+  workflow_run:
+    workflows: ["PR Decoration, Dockerize Java App and Deploy on EC2 with ASG"]
+    types:
+      - completed
+jobs:
+  sonarqube:
+    runs-on: 'self-hosted'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu' # Alternative distribution options are available.
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: '3.8.2'
+     
+      - name: SonarQube analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
+        run: |
+          uses: kitabisa/sonarqube-action@master
+          with:
+          host: ${{ secrets.SONAR_HOST_URL }}
+          login: ${{ secrets.SONAR_TOKEN }}
+         
+          #cd springboot-backend
+          #mvn -B verify sonar:sonar ; -Dsonar.projectName=GitHub_Actions_Java_Angular_Mysql ;-Dsonar.projectKey=akshaykam_GitHub_Actions_Java_Angular_Mysql ; -Dsonar.projectVersion=1.0 -Dsonar.sources=. ; -Dsonar.host.url={{ secrets.SONAR_HOST_URL }} ; -Dsonar.login=${{ secrets.SONAR_TOKEN }} 
+
+          # Download and configure Sonar Scanner
+          #wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+          #pwd
+          #unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+          #chmod -R +rw $(pwd)/sonar-scanner-cli-4.2.0.1873-linux
+          #export PATH=$PATH:$(pwd)/sonar-scanner-cli-4.2.0.1873-linux/bin
+          #export PATH=$PATH:/home/akshay/actions-runner/-work/GitHub_Actions_Java_Angular_Mysql/GitHub_Actions_Java_Angular_Mysql/sonar-scanner-4.2.0.1873-linux/bin
+          #echo $PATH
+          #sonar-scanner --version
+          
+
+          # Run Sonar Scanner
+          #sonar-scanner \
+            #-Dsonar.projectKey=akshaykam_GitHub_Actions_Java_Angular_Mysql \
+            #-Dsonar.sources=. \
+            #-Dsonar.host.url={{ secrets.SONAR_HOST_URL }} \
+            #-Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+     
