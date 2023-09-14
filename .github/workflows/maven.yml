@@ -31,8 +31,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Install Snyk CLI
-        run: sudo npm install -g snyk
+      - name: check Snyk CLI installation
+        run: snyk --version #snyk is installed on self-hosted runner
+        #sudo npm install -g snyk
 
       - name: Snyk Security Scan
         run: snyk auth ${{ secrets.SNYK_API_TOKEN }} && snyk test       
