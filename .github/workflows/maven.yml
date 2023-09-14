@@ -25,14 +25,14 @@ jobs:
    runs-on: 'self-hosted'
    container:
       image: node:14  # Use an image that matches your GLIBC version
-      options: --user akshay  # This allows you to install packages as the root user
+      options: --user root  # This allows you to install packages as the root user
 
    steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
       - name: Install Snyk CLI
-        run: npm install -g snyk
+        run: sudo npm install -g snyk
 
       - name: Snyk Security Scan
         run: snyk auth ${{ secrets.SNYK_API_TOKEN }} && snyk test       
