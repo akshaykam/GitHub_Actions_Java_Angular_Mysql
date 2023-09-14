@@ -26,6 +26,7 @@ jobs:
 # maximum allowed caching per repository : 10GB
 
  build-java:
+
     runs-on: 'self-hosted'
 
     steps:
